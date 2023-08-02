@@ -1,0 +1,1046 @@
+{
+	"info": {
+		"_postman_id": "fdc02a34-dd85-4682-a69b-45188dda61ae",
+		"name": "ASK_quiz_automate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26555179"
+	},
+	"item": [
+		{
+			"name": "NewUser_signup_S",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status Code is 200\",function()\r",
+							"{pm.response.to.have.status(200)});\r",
+							"\r",
+							"pm.test(\"User was Created\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"User was created\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"name\": \"Charles Snow\",\r\n  \"group\": \"ABC\",\r\n  \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/sign-up",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "database_con",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonid= pm.response.json();\r",
+							"pm.environment.set(\"userid\",jsonid[jsonid.length-1].id);\r",
+							"\r",
+							"var activecode= pm.response.json();\r",
+							"pm.environment.set(\"Actvationcode\",activecode[activecode.length-1].activationCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/api/users?_where=(email,eq,{{email}})",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "_where",
+							"value": "(email,eq,{{email}})"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "activateaccount_S",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"User activated Successfully\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"User was activated\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/activate/{{userid}}/{{Actvationcode}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"activate",
+						"{{userid}}",
+						"{{Actvationcode}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SingIn_S",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData=pm.response.json();\r",
+							"pm.environment.set(\"Stutoken\",jsonData.token);\r",
+							"\r",
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Student sign in \", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"STUDENT\");\r",
+							"});\r",
+							"pm.test(\"Response time is less than 250ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(250);\r",
+							"});\r",
+							"\r",
+							"var schema={\r",
+							"    \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\r",
+							"    \"$id\": \"http://example.com/example.json\",\r",
+							"    \"type\": \"object\",\r",
+							"    \"default\": {},\r",
+							"    \"title\": \"Root Schema\",\r",
+							"    \"required\": [\r",
+							"        \"user\",\r",
+							"        \"token\"\r",
+							"    ],\r",
+							"    \"properties\": {\r",
+							"        \"user\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"default\": {},\r",
+							"            \"title\": \"The user Schema\",\r",
+							"            \"required\": [\r",
+							"                \"id\",\r",
+							"                \"email\",\r",
+							"                \"name\",\r",
+							"                \"group\",\r",
+							"                \"role\",\r",
+							"                \"createdAt\",\r",
+							"                \"updatedAt\"\r",
+							"            ],\r",
+							"            \"properties\": {\r",
+							"                \"id\": {\r",
+							"                    \"type\": \"integer\",\r",
+							"                    \"default\": 0,\r",
+							"                    \"title\": \"The id Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        9744\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"email\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The email Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"student2@test.com\"\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"name\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The name Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"Student Two\"\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"group\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The group Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"ABC\"\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"role\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The role Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"STUDENT\"\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"createdAt\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The createdAt Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"2023-05-02T16:30:45.000Z\"\r",
+							"                    ]\r",
+							"                },\r",
+							"                \"updatedAt\": {\r",
+							"                    \"type\": \"string\",\r",
+							"                    \"default\": \"\",\r",
+							"                    \"title\": \"The updatedAt Schema\",\r",
+							"                    \"examples\": [\r",
+							"                        \"2023-05-02T16:36:41.000Z\"\r",
+							"                    ]\r",
+							"                }\r",
+							"            },\r",
+							"            \"examples\": [{\r",
+							"                \"id\": 9744,\r",
+							"                \"email\": \"student2@test.com\",\r",
+							"                \"name\": \"Student Two\",\r",
+							"                \"group\": \"ABC\",\r",
+							"                \"role\": \"STUDENT\",\r",
+							"                \"createdAt\": \"2023-05-02T16:30:45.000Z\",\r",
+							"                \"updatedAt\": \"2023-05-02T16:36:41.000Z\"\r",
+							"            }]\r",
+							"        },\r",
+							"        \"token\": {\r",
+							"            \"type\": \"string\",\r",
+							"            \"default\": \"\",\r",
+							"            \"title\": \"The token Schema\",\r",
+							"            \"examples\": [\r",
+							"                \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQyQHRlc3QuY29tIiwiaWF0IjoxNjkwNzAwMDg1LCJleHAiOjE2OTA3ODY0ODV9.eA-mhFRoVmk6fM5ZbgSdWxvUovc-R8GV5eJiXIiCT5M\"\r",
+							"            ]\r",
+							"        }\r",
+							"    },\r",
+							"    \"examples\": [{\r",
+							"        \"user\": {\r",
+							"            \"id\": 9744,\r",
+							"            \"email\": \"student2@test.com\",\r",
+							"            \"name\": \"Student Two\",\r",
+							"            \"group\": \"ABC\",\r",
+							"            \"role\": \"STUDENT\",\r",
+							"            \"createdAt\": \"2023-05-02T16:30:45.000Z\",\r",
+							"            \"updatedAt\": \"2023-05-02T16:36:41.000Z\"\r",
+							"        },\r",
+							"        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQyQHRlc3QuY29tIiwiaWF0IjoxNjkwNzAwMDg1LCJleHAiOjE2OTA3ODY0ODV9.eA-mhFRoVmk6fM5ZbgSdWxvUovc-R8GV5eJiXIiCT5M\"\r",
+							"    }]\r",
+							"}\r",
+							"pm.test('Schema is valid', function() { pm.expect(tv4.validate(jsonData, schema)).to.be.true; });\r",
+							"\r",
+							"\r",
+							"pm.test(\"User is STudent\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.user.role).to.eql(\"STUDENT\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/sign-in",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"sign-in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignIn_T",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"portnovurl\",\"http://ask-qa.portnov.com/api/v1\");\r",
+							"    "
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)});\r",
+							"\r",
+							"pm.test(\"Content type header is Present\",function()\r",
+							"{pm.response.to.have.header(\"Content-Type\")});\r",
+							"\r",
+							"pm.test(\"Content type is Application/Json\",function()\r",
+							"{\r",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.eql(\"application/json; charset=utf-8\")\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Status code Text\",function()\r",
+							"{pm.response.to.have.status(\"OK\")});\r",
+							"\r",
+							"var jsondata = pm.response.json();\r",
+							"pm.environment.set(\"token_quiz\",jsondata.token);\r",
+							"\r",
+							"pm.test(\"User is Teacher\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.user.role).to.eql(\"TEACHER\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"    "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"69thblock@ruchikoot.org\",\r\n  \"password\": \"Meena\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/sign-in",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"sign-in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAll_Quiz_T",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)})\r",
+							"\r",
+							"pm.test(\"Content-Type present in Header\",function()\r",
+							"{pm.response.to.have.header(\"Content-Type\")})\r",
+							"\r",
+							"pm.test(\"Content-type is Json\",function()\r",
+							"{pm.expect(pm.response.headers.get(\"Content-Type\")).to.equal(\"application/json; charset=utf-8\")})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/quizzes",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"quizzes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Creates_newQuiz_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)})\r",
+							"\r",
+							"pm.test(\"Status string is OK\",function()\r",
+							"{pm.response.to.have.status(\"OK\")})\r",
+							"\r",
+							"pm.test(\"Header have Content-type\",function()\r",
+							"{pm.response.to.have.header(\"Content-type\")})\r",
+							"\r",
+							"pm.test(\"Header content is Json\",function()\r",
+							"{pm.expect(pm.response.headers.get(\"Content-Type\")).to.equals(\"application/json; charset=utf-8\")})\r",
+							"\r",
+							"var jsondata1= pm.response.json();\r",
+							"pm.environment.set(\"Quizid\",jsondata1.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Meenas Quiz\",\r\n  \"totalScore\": 18,\r\n  \"passingPercentage\": 75,\r\n  \"showStopperQuestion\": 1,\r\n  \"questions\": [\r\n    {\r\n      \"type\": \"TEXTUAL\",\r\n      \"question\": \"What is your first name?\",\r\n      \"score\": 5\r\n    },\r\n    {\r\n      \"type\": \"SINGLE_CHOICE\",\r\n      \"question\": \"Which city is city largest in California?\",\r\n      \"score\": 7,\r\n      \"answer\": 2,\r\n      \"hasOtherOption\": false,\r\n      \"options\": [\r\n        \"San Francisco\",\r\n        \"Sacramento\",\r\n        \"Los Angeles\",\r\n        \"Redding\"\r\n      ]\r\n    },\r\n    {\r\n      \"type\": \"MULTIPLE_CHOICE\",\r\n      \"question\": \"Who was apple founded by?\",\r\n      \"score\": 6,\r\n      \"answers\": [\r\n        0,\r\n        1,\r\n        2\r\n      ],\r\n      \"hasOtherOption\": true,\r\n      \"options\": [\r\n        \"Steve Jobs\",\r\n        \"Steve Wozniak\",\r\n        \"Ronald Wayne\",\r\n        \"Ronald Reagan\"\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/quiz",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"quiz"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createAssign_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"var assignId= pm.response.json();\r",
+							"pm.environment.set(\"AssignId\",assignId.assignmentGroupID);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"quizId\": {{Quizid}},\r\n  \"userIds\": [{{userid}}]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/assignment",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"assignment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAll_Assignments_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 2000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+							"});\r",
+							"\r",
+							"var assignmentid1= pm.response.json();\r",
+							"pm.environment.set(\"assinid\",assignmentid1[assignmentid1.length-1].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/assignments",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"assignments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit_assign_S",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 2000\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Your test name\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData[jsonData.length-1].result).to.eql(\"PASSED\");\r",
+							"    pm.expect(jsonData[jsonData.length-1].status).to.eql(\"GRADED\");\r",
+							"    pm.expect(jsonData[jsonData.length-1].gradedBy).to.eql(\"AUTOMATIC\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Stutoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n{\"assignmentId\":{{assinid}},\"answers\":[{\"textAnswer\":\"dhsdhksa\",\"answer\":null},{\"textAnswer\":\"\",\"answer\":2},{\"textAnswer\":\"\",\"answer\":[0,1,2]}]}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/submit-assignment",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"submit-assignment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "grade_Assign_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 2000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"summary\": \"Summary from teacher\",\r\n  \"result\": \"PASSED\",\r\n  \"grades\": [\r\n    {\r\n      \"comment\": \"Teacher comment\",\r\n      \"additionalScore\": 5\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/assignment/{{assinid}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"assignment",
+						"{{assinid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "My_graded_S",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Stutoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/my-grades",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"my-grades"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forgot_password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Forgot Password\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Reset password email was sent\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{email}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/forgot-password",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"forgot-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "database_con Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonid= pm.response.json();\r",
+							"pm.environment.set(\"userid\",jsonid[jsonid.length-1].id);\r",
+							"\r",
+							"var activecode= pm.response.json();\r",
+							"pm.environment.set(\"Actvationcode\",activecode[activecode.length-1].activationCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/api/users?_where=(email,eq,{{email}})",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "_where",
+							"value": "(email,eq,{{email}})"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Password Changed\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Password was changed\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\r\n  \"password\": \"myNewPassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portnovurl}}/reset-password/{{userid}}/{{Actvationcode}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"reset-password",
+						"{{userid}}",
+						"{{Actvationcode}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete_AssignmentID_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Your test name\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Assignment was deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/assignment/{{assinid}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"assignment",
+						"{{assinid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete_Quiz_T",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\",function()\r",
+							"{pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Quiz was succesfullly Deleted\", function()\r",
+							"{var jsonData=pm.response.json();\r",
+							"pm.expect(jsonData.message).to.eql(\"Quiz was deleted\")});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/quiz/{{Quizid}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"quiz",
+						"{{Quizid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete_user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"User Removed\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"User Deleted\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token_quiz}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{portnovurl}}/users/{{userid}}",
+					"host": [
+						"{{portnovurl}}"
+					],
+					"path": [
+						"users",
+						"{{userid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
